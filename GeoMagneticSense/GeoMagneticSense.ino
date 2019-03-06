@@ -6,6 +6,7 @@
 
 
 #include <SparkFun_MAG3110.h>
+#include <EasyNeoPixels.h>
 
 MAG3110 mag = MAG3110(); //Instantiate MAG3110
 

@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.6">
+  <compound refid="namespacestd" kind="namespace"><name>std</name>
+  </compound>
+  <compound refid="_8_geo_magnetic_sense_8vsarduino_8h" kind="file"><name>.GeoMagneticSense.vsarduino.h</name>
+  </compound>
+  <compound refid="dir_d50f0c9f454e9bda555ba8035c3a07b6" kind="dir"><name>C:/LABS/Geomagnetic/GeoMagneticSense/__vm</name>
+  </compound>
+  <compound refid="dir_e6d2fd57f7286bab0812f4af1dae625c" kind="dir"><name>C:/LABS/Geomagnetic</name>
+  </compound>
+  <compound refid="dir_4c8e63db75496975c6564d59937a53b6" kind="dir"><name>C:/LABS/Geomagnetic/GeoMagneticSense</name>
+  </compound>
+  <compound refid="dir_29405338643c6b8bc1ba4daa09440346" kind="dir"><name>C:/LABS</name>
+  </compound>
+</doxygenindex>
