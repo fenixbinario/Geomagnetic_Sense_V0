@@ -2,6 +2,14 @@
  Name:		GeoMagneticSense.ino
  Created:	06/03/2019 21:54:08
  Author:	@fenixbinario	|	www.fenixbinario.com
+
+ Norte en el eje X
+
+ Z-----X 
+ |
+ |
+ Y
+
 */
 
 
