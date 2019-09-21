@@ -12,7 +12,6 @@ _Este sentido te permite tener una percepción del **norte** geomagnetico._
 ### `Hardware`
 * Atiny85		* 1	Unidad.
 * GMAG3131		* 1 Unidad.
-* WS2812		* 2 Unidades.
 * Led RGB		* 1 Unidad.
 * Motor			* 1 Unidades.
 * Diodo			* 1 Uidades.

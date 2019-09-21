@@ -3,8 +3,13 @@
  Created:	06/03/2019 21:54:08
  Author:	@fenixbinario	|	www.fenixbinario.com
 
- Norte en el eje X
+ Source: https://learn.sparkfun.com/tutorials/lsm303c-6dof-hookup-guide/all
+ Library: https://github.com/sparkfun/SparkFun_LSM303C_6_DOF_IMU_Breakout_Arduino_Library
 
+ //Comentario simple
+ //Comentario simple numero 2
+ Norte en el arco Tangente de X e Y
+ angulo*(180/M_PI)
  Z-----X 
  |
  |
@@ -12,44 +17,150 @@
 
 */
 
+// I2C interface by default
+//
 
-#include <SparkFun_MAG3110.h>
-#include <EasyNeoPixels.h>
-
-MAG3110 mag = MAG3110(); //Instantiate MAG3110
-
+#include "Wire.h"
+#include "SparkFunIMU.h"
+#include "SparkFunLSM303C.h"
+#include "LSM303CTypes.h"
+#include <math.h>
+/*
+   define DEBUG 1 in SparkFunLSM303C.cpp turns on debugging statements.
+   Redefine to 0 to turn them off.
+*/
+/*
+   SPI pins defined in SparkFunLSM303C.h for Pro Mini
+   D10 -> SDI/SDO
+   D11 -> SCLK
+   D12 -> CS_XL
+   D13 -> CS_MAG
+*/
+LSM303C myIMU;
 void setup() {
-
-	mag.initialize(); //Initialize the MAG3110
+	Wire.begin();//set up I2C bus, comment out if using SPI mode
+	Wire.setClock(400000L);//clock stretching, comment out if using SPI mode
+	Serial.begin(57600);//initialize serial monitor, maximum reliable baud for 3.3V/8Mhz ATmega328P is 57600
+	if (myIMU.begin(
+		///// Interface mode options
+		//MODE_SPI,
+		MODE_I2C,
+		///// Magnetometer output data rate options
+		//MAG_DO_0_625_Hz,
+		//MAG_DO_1_25_Hz,
+		//MAG_DO_2_5_Hz,
+		//MAG_DO_5_Hz,
+		//MAG_DO_10_Hz,
+		//MAG_DO_20_Hz,
+		MAG_DO_40_Hz,
+		//MAG_DO_80_Hz,
+		///// Magnetic field full scale options
+		//MAG_FS_4_Ga,
+		//MAG_FS_8_Ga,
+		//MAG_FS_12_Ga,
+		MAG_FS_16_Ga,
+		///// Magnetometer block data updating options
+		//MAG_BDU_DISABLE,
+		MAG_BDU_ENABLE,
+		///// Magnetometer X/Y axes ouput data rate
+		//MAG_OMXY_LOW_POWER,
+		//MAG_OMXY_MEDIUM_PERFORMANCE,
+		MAG_OMXY_HIGH_PERFORMANCE,
+		//MAG_OMXY_ULTRA_HIGH_PERFORMANCE,
+		///// Magnetometer Z axis ouput data rate
+		//MAG_OMZ_LOW_PW,
+		//MAG_OMZ_MEDIUM_PERFORMANCE,
+		MAG_OMZ_HIGH_PERFORMANCE,
+		//MAG_OMZ_ULTRA_HIGH_PERFORMANCE,
+		///// Magnetometer run mode
+		MAG_MD_CONTINUOUS,
+		//MAG_MD_SINGLE,
+		//MAG_MD_POWER_DOWN_1,
+		//MAG_MD_POWER_DOWN_2,
+		///// Acceleration full scale
+		ACC_FS_2g,
+		//ACC_FS_4g,
+		//ACC_FS_8g,
+		///// Accelerometer block data updating
+		//ACC_BDU_DISABLE,
+		ACC_BDU_ENABLE,
+		///// Enable X, Y, and/or Z axis
+		//ACC_DISABLE_ALL,
+		//ACC_X_ENABLE,
+		//ACC_Y_ENABLE,
+		//ACC_Z_ENABLE,
+		//ACC_X_ENABLE|ACC_Y_ENABLE,
+		//ACC_X_ENABLE|ACC_Z_ENABLE,
+		//ACC_Y_ENABLE|ACC_Z_ENABLE,
+		ACC_X_ENABLE | ACC_Y_ENABLE | ACC_Z_ENABLE,
+		///// Accelerometer output data rate
+		//ACC_ODR_POWER_DOWN
+		//ACC_ODR_10_Hz
+		//ACC_ODR_50_Hz
+		ACC_ODR_100_Hz
+		//ACC_ODR_200_Hz
+		//ACC_ODR_400_Hz
+		//ACC_ODR_800_Hz
+	) != IMU_SUCCESS)
+	{
+		Serial.println("Failed setup.");
+		while (1);
+	}
 }
-
-void loop() {
-
-	int x, y, z;
-
-	if (!mag.isCalibrated()) //If we're not calibrated
+void loop()
+{
+	float value;
+	value = myIMU.readAccelX();
+	// Assume that if X is not activated then none are (poor assumption, but demo)
+	if (!isnan(value))
 	{
-		if (!mag.isCalibrating()) //And we're not currently calibrating
-		{
-			//Entering calibration mode
-			mag.enterCalMode(); //This sets the output data rate to the highest possible and puts the mag sensor in active mode
-		}
+		Serial.print("\nAccelerometer:\n X = ");
+		Serial.println(value, 4);
+		Serial.print(" Y = ");
+		Serial.println(myIMU.readAccelY(), 4);
+		Serial.print(" Z = ");
+		Serial.println(myIMU.readAccelZ(), 4);
+	}
+	value = myIMU.readGyroX();
+	// Not supported by hardware, so will return NAN
+	if (!isnan(value))
+	{
+		Serial.print("\nGyroscope:\n X = ");
+		Serial.println(value, 4);
+		Serial.print(" Y = ");
+		Serial.println(myIMU.readGyroY(), 4);
+		Serial.print(" Z = ");
+		Serial.println(myIMU.readGyroZ(), 4);
+	}
+
+	value = myIMU.readMagX();
+	if (!isnan(value))
+	{
+		float angulo, valueY, valueZ;
+		Serial.print("\nMagnetometer:\n X = ");
+		Serial.println(value, 4);
+		Serial.print(" Y = ");
+		Serial.println(myIMU.readMagY(), 4);
+		Serial.print(" Z = ");
+		Serial.println(myIMU.readMagZ(), 4);
+		angulo = atan2(value, myIMU.readMagY());
+		angulo = angulo * (180 / M_PI);
+
+		if (angulo > -5 && angulo < 5)
+			Serial.println("NORTE");
 		else
-		{
-			//Must call every loop while calibrating to collect calibration data
-			//This will automatically exit calibration
-			//You can terminate calibration early by calling mag.exitCalMode();
-			mag.calibrate();
-		}
+			Serial.println(angulo, 0);
+
+
 	}
-	else
+	value = myIMU.readTempC();
+	if (!isnan(value))
 	{
-		//Calibrated!
+		Serial.print("\nThermometer:\n");
+		Serial.print(" Degrees C = ");
+		Serial.println(value, 4);
+		Serial.print(" Degrees F = ");
+		Serial.println(myIMU.readTempF(), 4);
 	}
-	mag.readMag(&x, &y, &z);
-
-
-	mag.readHeading();
-
-	delay(100);
+	delay(1000);//slow down output to make it easier to read, adjust as necessary
 }
